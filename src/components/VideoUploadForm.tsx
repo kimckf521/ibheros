@@ -14,6 +14,7 @@ interface VideoUploadFormProps {
     title: string;
     content: string;
     hashtags: string;
+    manimCode?: string; // New field
     coverImageUrl: string;
     videoUrl: string;
   };
@@ -25,6 +26,7 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
   const [hashtags, setHashtags] = useState(initialData?.hashtags || '');
+  const [manimCode, setManimCode] = useState(initialData?.manimCode || '');
   
   // File State
   const [coverImage, setCoverImage] = useState<File | null>(null);
@@ -169,6 +171,7 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
             title,
             content,
             hashtags,
+            manimCode,
             coverImageUrl,
             videoUrl,
             updatedAt: serverTimestamp(),
@@ -180,6 +183,7 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
             title,
             content,
             hashtags, 
+            manimCode,
             coverImageUrl,
             videoUrl,
             createdAt: serverTimestamp(),
@@ -206,6 +210,18 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
       </h1>
       
       <form onSubmit={handleSubmit}>
+        {/* Manim Code Section */}
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Manim Code</label>
+          <textarea
+            className={styles.textarea}
+            style={{ fontFamily: 'monospace', fontSize: '0.9rem', minHeight: '150px', background: '#f8fafc' }}
+            placeholder="Paste your Manim (Python) code here..."
+            value={manimCode}
+            onChange={(e) => setManimCode(e.target.value)}
+          />
+        </div>
+
         {/* Cover Image Upload */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Cover Image</label>

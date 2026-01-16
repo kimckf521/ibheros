@@ -5,13 +5,14 @@ import { useRouter, useParams } from 'next/navigation';
 import styles from '../../../../components/VideoGallery.module.css';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, updateDoc, doc } from 'firebase/firestore';
-import { Download, Copy, X, Play, Image as ImageIcon, Edit, CheckCircle, Check, LayoutGrid, List, Share2 } from 'lucide-react';
+import { Download, Copy, X, Play, Image as ImageIcon, Edit, CheckCircle, Check, LayoutGrid, List, Share2, Code } from 'lucide-react';
 
 interface Post {
   id: string;
   title: string;
   content: string;
   hashtags: string;
+  manimCode?: string; // New field
   coverImageUrl: string;
   videoUrl: string;
   isUsed?: boolean;
@@ -441,6 +442,24 @@ export default function VideoGalleryPage() {
                            </>
                        )}
                      </button>
+
+                     {/* Copy Code Button (Only if code exists) */}
+                     {selectedPost.manimCode && (
+                       <button 
+                         className={styles.actionBtn}
+                         onClick={() => handleCopy(selectedPost.manimCode || '', 'manim_code')}
+                         style={{ 
+                            height: '40px',
+                            justifyContent: 'center',
+                            background: copiedState['manim_code'] ? '#22c55e' : 'white',
+                            color: copiedState['manim_code'] ? 'white' : 'var(--text-heading)',
+                            borderColor: copiedState['manim_code'] ? '#22c55e' : 'var(--border-color)',
+                         }}
+                       >
+                         {copiedState['manim_code'] ? <Check size={16} /> : <Code size={16} />}
+                         {copiedState['manim_code'] ? "Copied" : "Code"}
+                       </button>
+                     )}
 
                      {/* Share Button */}
                      <button 
