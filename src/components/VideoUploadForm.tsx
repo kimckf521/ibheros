@@ -14,7 +14,8 @@ interface VideoUploadFormProps {
     title: string;
     content: string;
     hashtags: string;
-    manimCode?: string; // New field
+    manimCode?: string;
+    referenceLink?: string; // New field
     coverImageUrl: string;
     videoUrl: string;
   };
@@ -27,6 +28,7 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
   const [content, setContent] = useState(initialData?.content || '');
   const [hashtags, setHashtags] = useState(initialData?.hashtags || '');
   const [manimCode, setManimCode] = useState(initialData?.manimCode || '');
+  const [referenceLink, setReferenceLink] = useState(initialData?.referenceLink || '');
   
   // File State
   const [coverImage, setCoverImage] = useState<File | null>(null);
@@ -172,6 +174,7 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
             content,
             hashtags,
             manimCode,
+            referenceLink,
             coverImageUrl,
             videoUrl,
             updatedAt: serverTimestamp(),
@@ -184,6 +187,7 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
             content,
             hashtags, 
             manimCode,
+            referenceLink,
             coverImageUrl,
             videoUrl,
             createdAt: serverTimestamp(),
@@ -210,6 +214,18 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
       </h1>
       
       <form onSubmit={handleSubmit}>
+        {/* Reference Link Section */}
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Reference Link</label>
+          <input
+            type="url"
+            className={styles.input}
+            placeholder="https://example.com/reference"
+            value={referenceLink}
+            onChange={(e) => setReferenceLink(e.target.value)}
+          />
+        </div>
+
         {/* Manim Code Section */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Manim Code</label>
