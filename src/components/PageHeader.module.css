@@ -1,0 +1,18 @@
+.header {
+  background: var(--primary-color);
+  color: white;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.header h1 {
+  color: white;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  color: #94A3B8;
+  font-size: 1.25rem;
+  max-width: 600px;
+  margin: 0 auto;
+}

@@ -1,0 +1,55 @@
+.ctaBox {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  border-radius: 24px;
+  padding: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Add a subtle shine effect or pattern overlay if possible, strict CSS for now */
+.ctaBox::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(217, 119, 6, 0.15) 0%, rgba(217, 119, 6, 0) 70%);
+  border-radius: 50%;
+}
+
+.ctaBox > div {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+}
+
+.ctaBox h2 {
+  color: white;
+  margin-bottom: 16px;
+  font-size: 2.5rem;
+}
+
+.ctaBox p {
+  color: #E2E8F0;
+  font-size: 1.25rem;
+  opacity: 1;
+}
+
+@media (max-width: 900px) {
+  .ctaBox {
+    flex-direction: column;
+    text-align: center;
+    gap: 40px;
+    padding: 48px 24px;
+  }
+  
+  .ctaBox > div {
+    max-width: 100%;
+  }
+}

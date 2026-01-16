@@ -1,0 +1,243 @@
+{
+  "header": {
+    "home": "Home",
+    "services": "Services",
+    "pricing": "Pricing",
+    "becomeTutor": "Become a Tutor",
+    "bookSession": "Book a Session"
+  },
+  "hero": {
+    "title1": "Unlock Your Full",
+    "title2": "Academic Potential",
+    "subtitle": "Premium tutoring services tailored to your learning style. Join Australia's leading tuition centre and achieve the results you deserve.",
+    "exploreServices": "Explore Services"
+  },
+  "stats": {
+    "students": "Students Helped",
+    "tutors": "Expert Tutors",
+    "results": "ATAR 90+ Results",
+    "rating": "Student Rating"
+  },
+  "services": {
+    "title": "Our Tutoring Services",
+    "description": "We offer comprehensive tutoring for students of all ages, specializing in VCE and HSC preparation.",
+    "viewAll": "View All Services",
+    "maths": {
+      "title": "Mathematics",
+      "desc": "From primary school basics to complex calculus and specialist mathematics."
+    },
+    "english": {
+      "title": "English & Literature",
+      "desc": "Improve essay writing, reading comprehension, and analytical skills."
+    },
+    "science": {
+      "title": "Science",
+      "desc": "Physics, Chemistry, Biology. Understand complex concepts and practical applications."
+    },
+    "specialist": {
+      "title": "VCE & HSC Specialist",
+      "desc": "Targeted support for Year 11 & 12 students to maximize ATAR results in English, Maths, and Sciences."
+    }
+  },
+  "servicesPage": {
+    "title": "Our Premium Services",
+    "subtitle": "Comprehensive support for your academic and lifestyle needs in Australia.",
+    "tabs": {
+      "academic": "Academic Tutoring",
+      "butler": "Student Butler",
+      "visa": "Visa Services"
+    },
+    "academic": {
+      "title": "Academic Excellence",
+      "description": "Our core offering. Tailored tutoring to help you achieve your best results.",
+      "subjects": "Popular Subjects",
+      "pricing": "Invest in Your Future"
+    },
+    "butler": {
+      "title": "Student Butler Service",
+      "description": "Your personal concierge for life in a new country. From airport pickup to medical registration, we handle the details so you can focus on studying.",
+      "tiers": {
+        "basic": {
+          "name": "Basic",
+          "price": "AUD $999 / year",
+          "features": [
+            "Airport Pickup",
+            "SIM Card Registration Assistance",
+            "Transportation Card Setup",
+            "School Enrollment Assistance",
+            "Student Accommodation Application",
+            "Homestay Arrangement",
+            "Police Check Application (If Needed)",
+            "GP (Doctor) Appointment Arrangement"
+          ]
+        },
+        "standard": {
+          "name": "Standard",
+          "price": "AUD $2,499 / year",
+          "features": [
+            "Includes all Basic features",
+            "Flight Booking Assistance",
+            "Bank Account Opening Assistance",
+            "Course Selection & Transfer Process Assistance",
+            "TFN Application Guidance",
+            "Academic & Life Consultation",
+            "10 Hours Homework Tutoring",
+            "Visa Renewal Guidance & Document Review"
+          ]
+        },
+        "vip": {
+          "name": "VIP",
+          "price": "AUD $4,999 / year",
+          "features": [
+            "Includes all Standard features",
+            "Extra 20 Hours Homework Tutoring",
+            "Lost Document Assistance",
+            "Moving Service Arrangement",
+            "Student Visa Renewal",
+            "Internship Matching",
+            "Legal Service Referral",
+            "Migration Service Referral",
+            "Priority Service Channel"
+          ]
+        }
+      }
+    },
+    "visa": {
+      "title": "Visa & Immigration",
+      "description": "Professional guidance through complex immigration processes.",
+      "pricingNotice": "Tailored pricing based on individual assessment",
+      "cta": "Get a Quote",
+      "services": [
+        {
+          "title": "Student Visa Application",
+          "description": "Complete handling of your Subclass 500 visa application, including GTE statement drafting and document review."
+        },
+        {
+          "title": "Graduate Work Visa",
+          "description": "Transition from student to professional with Subclass 485 visa support. We help you understand your eligibility and rights."
+        },
+        {
+          "title": "Residency & PR Consult",
+          "description": "Long-term planning for Permanent Residency. Strategic advice on skilled migration pathways."
+        },
+        {
+          "title": "Document Health Check",
+          "description": "Already prepared your application? Let our experts review your documents to minimize the risk of refusal or delay."
+        }
+      ]
+    }
+  },
+  "cta": {
+    "title": "Ready to achieve your best?",
+    "text": "Join hundreds of students who have transformed their grades with IB Heros.",
+    "button": "Get Started Today"
+  },
+  "footer": {
+    "company": "Company",
+    "services": "Services",
+    "legal": "Legal",
+    "about": "About Us",
+    "careers": "Careers",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "disclaimer": "Disclaimer",
+    "rights": "All rights reserved."
+  },
+  "pricing": {
+    "group": {
+      "title": "Group Sessions",
+      "price": "$40",
+      "unit": "/hr",
+      "desc": "Small groups of 2-4 students",
+      "features": ["Collaborative learning", "Peer support", "Expert guidance"],
+      "button": "Book Now"
+    },
+    "private": {
+      "popular": "MOST POPULAR",
+      "title": "1-on-1 Private",
+      "price": "$70",
+      "unit": "/hr",
+      "desc": "Personalized individual attention",
+      "features": ["Tailored lesson plans", "Flexible scheduling", "Focused feedback"],
+      "button": "Book Now"
+    },
+    "term": {
+      "title": "Term Package",
+      "price": "$650",
+      "unit": "/term",
+      "desc": "10 Weekly 1-on-1 sessions",
+      "features": ["Guaranteed timeslot", "Progress tracking", "Exam prep materials"],
+      "button": "Book Now"
+    }
+  },
+  "contactPage": {
+    "title": "Get in Touch",
+    "desc": "Fill out the form and our team will get back to you within 24 hours to organize your first session.",
+    "phone": "Phone",
+    "email": "Email",
+    "location": "Location",
+    "form": {
+      "title": "Enquiry Form",
+      "studentName": "Student Name",
+      "yearLevel": "Year Level",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "subject": "Interested Subject",
+      "maths": "Mathematics",
+      "english": "English",
+      "science": "Science",
+      "other": "Other",
+      "message": "Message / Specific Requirements",
+      "submit": "Send Message"
+    }
+  },
+  "joinTeamPage": {
+    "title": "Why join IB Heros?",
+    "desc": "We are always looking for passionate, high-achieving individuals to join our team. If you have a strong academic record and a desire to help others succeed, we want to hear from you.",
+    "form": {
+      "title": "Application Form",
+      "personal": {
+        "title": "Personal Information",
+        "firstName": "First Name *",
+        "lastName": "Last Name *",
+        "preferredName": "Preferred Name",
+        "email": "Email *",
+        "phone": "Phone Number",
+        "countryCity": "Country With City * (e.g. Sydney, Australia)",
+        "intro": "Personal Introduction * (200-300 words)"
+      },
+      "academic": {
+        "title": "Academic Information",
+        "subjects": "Preferred Teaching Subjects *",
+        "ibScores": "IB Scores (if applicable)",
+        "aLevelScores": "A-Level Scores (if applicable)",
+        "atar": "ATAR (if applicable)",
+        "university": "Degree, Major and University *"
+      },
+      "experience": {
+        "title": "Experience & Skills",
+        "teachingExp": "Teaching Experience *",
+        "strengths": "Strengths with Examples *",
+        "achievements": "Personal Achievements *"
+      },
+      "uploads": {
+        "title": "Document Uploads",
+        "photo": "Photo Submission *",
+        "transcripts": "Academic Transcript / Competition Achievement *"
+      },
+      "submit": "Submit Application",
+      "submitting": "Submitting...",
+      "success": "Application submitted successfully!",
+      "error": "Failed to submit. Please try again."
+    },
+    "benefits": [
+      "Competitive hourly rates",
+      "Flexible scheduling",
+      "Supportive team environment",
+      "Professional development opportunities",
+      "Access to premium resources",
+      "Impact students' lives"
+    ]
+  }
+}

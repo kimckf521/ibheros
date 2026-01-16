@@ -1,0 +1,243 @@
+{
+  "header": {
+    "home": "首页",
+    "services": "课程服务",
+    "pricing": "价格方案",
+    "becomeTutor": "成为导师",
+    "bookSession": "预约试听"
+  },
+  "hero": {
+    "title1": "释放您的",
+    "title2": "学术潜能",
+    "subtitle": "为您量身定制的高端辅导服务。加入澳大利亚领先的补习中心，取得您应得的优异成绩。",
+    "exploreServices": "探索课程"
+  },
+  "stats": {
+    "students": "辅导学生",
+    "tutors": "专家导师",
+    "results": "ATAR 90+ 成绩",
+    "rating": "学生好评"
+  },
+  "services": {
+    "title": "我们的辅导服务",
+    "description": "我们为各年龄段学生提供全面辅导，专注于 VCE 和 HSC 备考。",
+    "viewAll": "查看所有课程",
+    "maths": {
+      "title": "数学",
+      "desc": "从小学基础到复杂微积分和专业数学。"
+    },
+    "english": {
+      "title": "英语与文学",
+      "desc": "提高论文写作、阅读理解和分析能力。"
+    },
+    "science": {
+      "title": "科学",
+      "desc": "物理、化学、生物。深入理解复杂概念及其实际应用。"
+    },
+    "specialist": {
+      "title": "VCE & HSC 专家",
+      "desc": "针对 11 和 12 年级学生的定向辅导，最大化英语、数学和科学的 ATAR 成绩。"
+    }
+  },
+  "servicesPage": {
+    "title": "我们的高端服务",
+    "subtitle": "全方位支持您在澳洲的学业与生活需求。",
+    "tabs": {
+      "academic": "学术辅导",
+      "butler": "留学生管家",
+      "visa": "签证服务"
+    },
+    "academic": {
+      "title": "卓越学术",
+      "description": "我们的核心服务。量身定制的辅导，助您取得理想成绩。",
+      "subjects": "热门科目",
+      "pricing": "投资您的未来"
+    },
+    "butler": {
+      "title": "留学生管家服务",
+      "description": "您在异国他乡的私人助理。从接机到医疗注册，我们处理琐事，让您专注于学业。",
+      "tiers": {
+        "basic": {
+          "name": "基础版",
+          "price": "AUD $999 / 年",
+          "features": [
+            "落地接机",
+            "协助办理电话卡",
+            "办理交通卡",
+            "协助完成入学报到",
+            "申请学生宿舍",
+            "安排寄宿家庭",
+            "办理无犯罪证明 (如需)",
+            "安排家庭医生(GP)预约"
+          ]
+        },
+        "standard": {
+          "name": "标准版",
+          "price": "AUD $2,499 / 年",
+          "features": [
+            "包含基础版所有服务",
+            "协助预订机票",
+            "协助开设银行账户",
+            "学校选课与转学流程协助",
+            "TFN申请指导",
+            "学业/生活咨询辅导",
+            "作业辅导 10小时",
+            "续签指导/材料审核"
+          ]
+        },
+        "vip": {
+          "name": "VIP版",
+          "price": "AUD $4,999 / 年",
+          "features": [
+            "包含标准版所有服务",
+            "额外20小时作业辅导",
+            "证件丢失协助",
+            "安排搬家服务",
+            "办理续学签",
+            "实习资源匹配",
+            "法律服务转介",
+            "移民服务转介",
+            "优先服务通道"
+          ]
+        }
+      }
+    },
+    "visa": {
+      "title": "签证与移民",
+      "description": "专业指导复杂的移民流程。",
+      "pricingNotice": "根据个人情况定制报价",
+      "cta": "获取报价",
+      "services": [
+        {
+          "title": "学生签证申请",
+          "description": "全权处理您的500类签证申请，包括GTE陈述起草和文件审核。"
+        },
+        {
+          "title": "毕业生工作签证",
+          "description": "协助您从学生过渡到职场，提供485类签证支持。帮助您了解资格和权利。"
+        },
+        {
+          "title": "永居与PR咨询",
+          "description": "永久居留的长远规划。技术移民途径的战略建议。"
+        },
+        {
+          "title": "文件健康检查",
+          "description": "已经准备好申请了吗？让我们的专家审核您的文件，最大限度降低被拒或延误的风险。"
+        }
+      ]
+    }
+  },
+  "cta": {
+    "title": "准备好取得最佳成绩了吗？",
+    "text": "加入成百上千名通过 IB Heros 改变成绩的学生行列。",
+    "button": "立即开始"
+  },
+  "footer": {
+    "company": "公司",
+    "services": "服务",
+    "legal": "法律",
+    "about": "关于我们",
+    "careers": "招贤纳士",
+    "contact": "联系我们",
+    "privacy": "隐私政策",
+    "terms": "条款与条件",
+    "disclaimer": "免责声明",
+    "rights": "版权所有。"
+  },
+  "pricing": {
+    "group": {
+      "title": "小组课程",
+      "price": "$40",
+      "unit": "/小时",
+      "desc": "2-4 人小组学习",
+      "features": ["协作学习环境", "同伴互助", "专家指导"],
+      "button": "立即预订"
+    },
+    "private": {
+      "popular": "最受欢迎",
+      "title": "一对一私教",
+      "price": "$70",
+      "unit": "/小时",
+      "desc": "个性化专属辅导",
+      "features": ["定制学习计划", "灵活的时间安排", "针对性反馈"],
+      "button": "立即预订"
+    },
+    "term": {
+      "title": "学期套餐",
+      "price": "$650",
+      "unit": "/学期",
+      "desc": "10 次每周一对一课程",
+      "features": ["固定时间段", "进度跟踪", "备考资料"],
+      "button": "立即预订"
+    }
+  },
+  "contactPage": {
+    "title": "联系我们",
+    "desc": "填写表格，我们的团队将在24小时内联系您安排首次课程。",
+    "phone": "电话",
+    "email": "邮箱",
+    "location": "地址",
+    "form": {
+      "title": "咨询表格",
+      "studentName": "学生姓名",
+      "yearLevel": "年级",
+      "email": "邮箱地址",
+      "phone": "联系电话",
+      "subject": "感兴趣的科目",
+      "maths": "数学",
+      "english": "英语",
+      "science": "科学",
+      "other": "其他",
+      "message": "留言 / 特殊要求",
+      "submit": "发送信息"
+    }
+  },
+  "joinTeamPage": {
+    "title": "为什么加入 IB Heros？",
+    "desc": "我们一直在寻找充满激情、成绩优异的人才加入我们的团队。如果您有出色的学术记录并且渴望帮助他人成功，我们要找的就是您。",
+    "form": {
+      "title": "申请表格",
+      "personal": {
+        "title": "个人信息",
+        "firstName": "名字 *",
+        "lastName": "姓氏 *",
+        "preferredName": "首选称呼",
+        "email": "邮箱地址 *",
+        "phone": "联系电话",
+        "countryCity": "所在国家和城市 * (例如：悉尼, 澳大利亚)",
+        "intro": "个人简介 * (200-300字)"
+      },
+      "academic": {
+        "title": "学术背景",
+        "subjects": "首选教学科目 *",
+        "ibScores": "IB 分数 (如适用)",
+        "aLevelScores": "A-Level 分数 (如适用)",
+        "atar": "ATAR (如适用)",
+        "university": "学位, 专业及毕业院校 *"
+      },
+      "experience": {
+        "title": "经验与技能",
+        "teachingExp": "教学经验 *",
+        "strengths": "优势与实例 *",
+        "achievements": "个人成就 *"
+      },
+      "uploads": {
+        "title": "文件上传",
+        "photo": "上传照片 *",
+        "transcripts": "成绩单 / 竞赛证书 *"
+      },
+      "submit": "提交申请",
+      "submitting": "提交中...",
+      "success": "申请提交成功！",
+      "error": "提交失败，请重试。"
+    },
+    "benefits": [
+      "具有竞争力的时薪",
+      "灵活的时间安排",
+      "支持性的团队环境",
+      "职业发展机会",
+      "获得优质教学资源",
+      "影响学生的生活"
+    ]
+  }
+}

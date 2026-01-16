@@ -1,0 +1,81 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  background: var(--section-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+}
+
+.infoItem h4 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.infoItem p {
+  margin: 0;
+  color: var(--text-light);
+}
+
+.formCard {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  background: var(--section-bg);
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: var(--accent-color);
+  background: white;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
