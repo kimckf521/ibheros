@@ -297,8 +297,10 @@ export default function VideoGalleryPage() {
                     {post.coverImageUrl ? (
                       <img src={post.coverImageUrl} alt={post.title} className={styles.cardImage} />
                     ) : (
-                      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        No Cover
+                      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', textAlign: 'center' }}>
+                        <span style={{ color: 'white', fontWeight: 600, fontSize: '1.2rem', lineHeight: 1.4 }}>
+                          {post.title}
+                        </span>
                       </div>
                     )}
                     

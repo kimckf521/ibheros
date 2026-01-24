@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './Upload.module.css';
-import { UploadCloud, Image as ImageIcon, Video as VideoIcon, X } from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, Video as VideoIcon, X, Trash2, ChevronLeft } from 'lucide-react';
 import { storage, db } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { collection, addDoc, serverTimestamp, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 interface VideoUploadFormProps {
   initialData?: {
@@ -41,6 +41,7 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
 
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [isDraggingVideo, setIsDraggingVideo] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // New state for modal
 
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -135,6 +136,26 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
     if (videoInputRef.current) videoInputRef.current.value = '';
   };
 
+  const handleDelete = () => {
+    if (!initialData?.id) return;
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!initialData?.id) return;
+
+    try {
+      setIsSubmitting(true);
+      await deleteDoc(doc(db, "posts", initialData.id));
+      // alert("Video deleted successfully."); // Removed as requested
+      router.push('/upload/videos');
+    } catch (error: any) {
+      console.error("Error deleting video:", error);
+      alert(`Failed to delete: ${error.message}`);
+      setIsSubmitting(false);
+    }
+  };
+
   // Submit Handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,7 +200,8 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
             videoUrl,
             updatedAt: serverTimestamp(),
           });
-          alert("Video updated successfully!");
+          // alert("Video updated successfully!"); // Removed as requested
+          router.push('/upload/videos'); // Direct redirect
       } else {
           // CREATE
           await addDoc(collection(db, "posts"), {
@@ -192,26 +214,48 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
             videoUrl,
             createdAt: serverTimestamp(),
           });
-          alert("Video published successfully!");
+          // alert("Video published successfully!"); // Removed as requested
       }
 
-      
-      // Navigate to Videos Page
+      // Navigate to Videos Page - redirect immediately after save
+      setIsSubmitting(false);
       router.push('/upload/videos');
+      return; // Ensure no further execution
 
     } catch (error: any) {
       console.error("Error saving post:", error);
       alert(`Failed to save: ${error.message}`);
-    } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
     <div className={styles.card}>
-      <h1 className={styles.title}>
-          {isEditMode ? 'Edit Video' : 'Create New Video'}
-      </h1>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' }}>
+        <button 
+          onClick={() => router.push('/upload/videos')}
+          style={{ 
+            background: 'none', 
+            border: 'none', 
+            cursor: 'pointer', 
+            marginRight: '1rem',
+            padding: '0.5rem',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'background-color 0.2s',
+          }}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title="Back to Videos"
+        >
+          <ChevronLeft size={24} color="#334155" />
+        </button>
+        <h1 className={styles.title} style={{ marginBottom: 0 }}>
+            {isEditMode ? 'Edit Video' : 'Create New Video'}
+        </h1>
+      </div>
       
       <form onSubmit={handleSubmit}>
         {/* Reference Link Section */}
@@ -343,12 +387,101 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
           />
         </div>
 
-        <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-          <UploadCloud size={20} />
-          {isSubmitting ? 'Saving...' : (isEditMode ? 'Update Video' : 'Publish Video')}
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <button type="submit" className={styles.submitBtn} disabled={isSubmitting} style={{flex: 1}}>
+            <UploadCloud size={20} />
+            {isSubmitting ? 'Saving...' : (isEditMode ? 'Update Video' : 'Publish Video')}
+          </button>
+
+          {isEditMode && (
+            <button 
+              type="button" 
+              onClick={handleDelete}
+              disabled={isSubmitting}
+              className={styles.submitBtn}
+              style={{ background: '#ef4444', flex: 1 }}
+              title="Delete Video"
+            >
+              <Trash2 size={20} />
+              <span>Delete Video</span>
+            </button>
+          )}
+        </div>
 
       </form>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '2rem',
+            borderRadius: '1rem',
+            maxWidth: '400px',
+            width: '90%',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: 600, 
+              color: '#1e293b', 
+              marginBottom: '1rem' 
+            }}>
+              Delete Video
+            </h3>
+            <p style={{ 
+              color: '#64748b', 
+              marginBottom: '2rem' 
+            }}>
+              Are you sure you want to delete this video?
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid #e2e8f0',
+                  background: 'white',
+                  color: '#64748b',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  flex: 1
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '0.5rem',
+                  border: 'none',
+                  background: '#ef4444',
+                  color: 'white',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  flex: 1
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
