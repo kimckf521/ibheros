@@ -208,6 +208,22 @@
   border-color: var(--text-light);
 }
 
+/* Disabled State for Action Buttons */
+.actionBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: #f1f5f9;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .downloadGroup {
   display: flex;
   gap: 1rem;
@@ -394,4 +410,3 @@
      padding-top: 0;
    }
 }
-

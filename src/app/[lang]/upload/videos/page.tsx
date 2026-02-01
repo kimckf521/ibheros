@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import styles from '../../../../components/VideoGallery.module.css';
-import { db } from '@/lib/firebase';
+import { db, auth } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, updateDoc, doc } from 'firebase/firestore';
-import { Download, Copy, X, Play, Image as ImageIcon, Edit, CheckCircle, Check, LayoutGrid, List, Share2, Code, Link } from 'lucide-react';
+import { Download, Copy, X, Play, Image as ImageIcon, Edit, CheckCircle, Check, LayoutGrid, List, Share2, Code, Link, Loader2 } from 'lucide-react';
 
 interface Post {
   id: string;
@@ -13,9 +13,13 @@ interface Post {
   content: string;
   hashtags: string;
   manimCode?: string;
-  referenceLink?: string; // New field
+  referenceLink?: string;
+  tiktokDescription?: string;
+  tiktokHashtags?: string; // New field
   coverImageUrl: string;
-  videoUrl: string;
+  videoUrl?: string; // Legacy
+  videoUrlEn?: string; // New English
+  videoUrlZh?: string; // New Chinese
   isUsed?: boolean;
   usedAt?: any;
   createdAt: any;
@@ -29,6 +33,7 @@ export default function VideoGalleryPage() {
 
   const [expandedMedia, setExpandedMedia] = useState<{ type: 'image' | 'video', url: string } | null>(null);
   const [copiedState, setCopiedState] = useState<{[key: string]: boolean}>({});
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Helper to fetch posts (extracted to reuse after updates)
@@ -49,10 +54,12 @@ export default function VideoGalleryPage() {
   };
 
   useEffect(() => {
+    // Fetch posts directly (Public access relying on Security Rules)
     fetchPosts();
   }, []);
 
-  const handleDownload = async (url: string, filename: string) => {
+  const handleDownload = async (url: string, filename: string, id?: string) => {
+    if (id) setDownloadingId(id);
     try {
       // 1. Fetch file as Blob (using Proxy to bypass CORS)
       const proxyUrl = `/api/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
@@ -74,11 +81,13 @@ export default function VideoGalleryPage() {
              files: [file],
              title: filename,
            });
+           setDownloadingId(null);
            return; // Success, stop here
         } catch (shareError: any) {
            if (shareError.name !== 'AbortError') {
               console.warn("Share failed, falling back to download:", shareError);
            } else {
+              setDownloadingId(null);
               return; // User cancelled share
            }
         }
@@ -97,6 +106,8 @@ export default function VideoGalleryPage() {
     } catch (error: any) {
       console.error("Download/Share error:", error);
       alert(`Action failed: ${error.message}`);
+    } finally {
+      if (id) setDownloadingId(null);
     }
   };
 
@@ -482,6 +493,8 @@ export default function VideoGalleryPage() {
                        </button>
                      )}
 
+
+
                      {/* Share Button */}
                      <button 
                         className={styles.actionBtn}
@@ -503,14 +516,15 @@ export default function VideoGalleryPage() {
 
 
               {/* Two-Card Download Layout - Forced 2 Column on Mobile */}
+              {/* Multi-Card Download Layout */}
               <div style={{ 
                   display: 'grid', 
-                  gridTemplateColumns: '1fr 1fr', // Always 2 columns
-                  gap: '0.75rem', // Smaller gap for mobile
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', // Flexible columns
+                  gap: '1rem', 
                   marginBottom: '2rem' 
               }}>
                 
-                {/* 1. Download Cover Card */}
+                {/* 1. Cover Image Card */}
                 <div style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                    <div 
                       style={{ aspectRatio: '16/9', background: '#f1f5f9', position: 'relative', cursor: 'pointer' }}
@@ -525,62 +539,128 @@ export default function VideoGalleryPage() {
                         />
                       )}
                       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)', color: 'white', padding: '0.5rem', fontSize: '0.75rem', fontWeight: 500, textAlign: 'center' }}>
-                        View
+                        View Cover
                       </div>
                    </div>
                    <div style={{ padding: '0.75rem', marginTop: 'auto' }}>
                       <button 
                          className={styles.actionBtn} 
                          style={{ width: '100%', justifyContent: 'center', fontSize: '0.8rem', padding: '0.5rem' }}
-                         onClick={() => handleDownload(selectedPost.coverImageUrl, `cover_${selectedPost.title}.jpg`)}
+                         onClick={() => handleDownload(selectedPost.coverImageUrl, `cover_${selectedPost.title}.jpg`, 'cover')}
+                         disabled={downloadingId === 'cover'}
                       >
-                         <ImageIcon size={14} /> Save
+                         {downloadingId === 'cover' ? <Loader2 size={14} className={styles.spin} /> : <ImageIcon size={14} />} 
+                         {downloadingId === 'cover' ? 'Saving...' : 'Save Image'}
                       </button>
                    </div>
                 </div>
 
-                {/* 2. Download Video Card */}
-                <div style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                   <div 
-                     style={{ aspectRatio: '16/9', background: '#000', position: 'relative', cursor: 'pointer' }}
-                     onClick={() => setExpandedMedia({ type: 'video', url: selectedPost.videoUrl })}
-                     title="Click to watch full video"
-                   >
-                      {/* Video Preview: Use actual Video tag for previewing */}
-                      {selectedPost.videoUrl ? (
-                         <video 
-                            src={selectedPost.videoUrl} 
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            // Removed controls here to make it act as a thumbnail button, lightbox has controls
-                         />
-                      ) : (
-                         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                            No Video
-                         </div>
-                      )}
-                      
-                      {/* Play Icon Overlay */}
-                      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.1)' }}>
-                         <div style={{ background: 'rgba(0,0,0,0.6)', borderRadius: '50%', padding: '0.5rem' }}>
-                            <Play size={24} fill="white" color="white" />
-                         </div>
-                      </div>
-                   </div>
-                   <div style={{ padding: '0.75rem', marginTop: 'auto' }}>
-                      <button 
-                         className={`${styles.actionBtn} ${styles.primaryBtn}`}
-                         style={{ width: '100%', justifyContent: 'center', fontSize: '0.8rem', padding: '0.5rem' }}
-                         onClick={() => handleDownload(selectedPost.videoUrl, `video_${selectedPost.title}.mp4`)}
-                      >
-                         <Download size={14} /> Download
-                      </button>
-                   </div>
-                </div>
+                {/* 2. English Video Card (if exists) */}
+                {selectedPost.videoUrlEn && (
+                    <div style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        <div 
+                            style={{ aspectRatio: '16/9', background: '#000', position: 'relative', cursor: 'pointer' }}
+                            onClick={() => setExpandedMedia({ type: 'video', url: selectedPost.videoUrlEn! })}
+                            title="Click to watch English video"
+                        >
+                            <video 
+                                src={selectedPost.videoUrlEn} 
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.1)' }}>
+                                <div style={{ background: 'rgba(0,0,0,0.6)', borderRadius: '50%', padding: '0.5rem' }}>
+                                    <Play size={24} fill="white" color="white" />
+                                </div>
+                            </div>
+                            <div style={{ position: 'absolute', top: '0.5rem', left: '0.5rem', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 600 }}>
+                                English
+                            </div>
+                        </div>
+                        <div style={{ padding: '0.75rem', marginTop: 'auto' }}>
+                             <button 
+                                className={`${styles.actionBtn} ${styles.primaryBtn}`}
+                                style={{ width: '100%', justifyContent: 'center', fontSize: '0.8rem', padding: '0.5rem' }}
+                                onClick={() => handleDownload(selectedPost.videoUrlEn!, `video_en_${selectedPost.title}.mp4`, 'video_en')}
+                                disabled={downloadingId === 'video_en'}
+                             >
+                                {downloadingId === 'video_en' ? <Loader2 size={14} className={styles.spin} /> : <Download size={14} />} 
+                                {downloadingId === 'video_en' ? 'Preparing...' : 'Download EN'}
+                             </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* 3. Chinese Video Card (if exists) */}
+                {selectedPost.videoUrlZh && (
+                    <div style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        <div 
+                            style={{ aspectRatio: '16/9', background: '#000', position: 'relative', cursor: 'pointer' }}
+                            onClick={() => setExpandedMedia({ type: 'video', url: selectedPost.videoUrlZh! })}
+                            title="Click to watch Chinese video"
+                        >
+                            <video 
+                                src={selectedPost.videoUrlZh} 
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.1)' }}>
+                                <div style={{ background: 'rgba(0,0,0,0.6)', borderRadius: '50%', padding: '0.5rem' }}>
+                                    <Play size={24} fill="white" color="white" />
+                                </div>
+                            </div>
+                            <div style={{ position: 'absolute', top: '0.5rem', left: '0.5rem', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 600 }}>
+                                Chinese
+                            </div>
+                        </div>
+                        <div style={{ padding: '0.75rem', marginTop: 'auto' }}>
+                             <button 
+                                className={`${styles.actionBtn} ${styles.primaryBtn}`}
+                                style={{ width: '100%', justifyContent: 'center', fontSize: '0.8rem', padding: '0.5rem' }}
+                                onClick={() => handleDownload(selectedPost.videoUrlZh!, `video_zh_${selectedPost.title}.mp4`, 'video_zh')}
+                                disabled={downloadingId === 'video_zh'}
+                             >
+                                {downloadingId === 'video_zh' ? <Loader2 size={14} className={styles.spin} /> : <Download size={14} />} 
+                                {downloadingId === 'video_zh' ? 'Preparing...' : 'Download CN'}
+                             </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* 4. Legacy/Fallback Video Card */}
+                {!selectedPost.videoUrlEn && !selectedPost.videoUrlZh && selectedPost.videoUrl && (
+                    <div style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        <div 
+                            style={{ aspectRatio: '16/9', background: '#000', position: 'relative', cursor: 'pointer' }}
+                            onClick={() => setExpandedMedia({ type: 'video', url: selectedPost.videoUrl! })}
+                        >
+                            <video 
+                                src={selectedPost.videoUrl} 
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.1)' }}>
+                                <div style={{ background: 'rgba(0,0,0,0.6)', borderRadius: '50%', padding: '0.5rem' }}>
+                                    <Play size={24} fill="white" color="white" />
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{ padding: '0.75rem', marginTop: 'auto' }}>
+                             <button 
+                                className={`${styles.actionBtn} ${styles.primaryBtn}`}
+                                style={{ width: '100%', justifyContent: 'center', fontSize: '0.8rem', padding: '0.5rem' }}
+                                onClick={() => handleDownload(selectedPost.videoUrl!, `video_${selectedPost.title}.mp4`, 'video_legacy')}
+                                disabled={downloadingId === 'video_legacy'}
+                             >
+                                {downloadingId === 'video_legacy' ? <Loader2 size={14} className={styles.spin} /> : <Download size={14} />} 
+                                {downloadingId === 'video_legacy' ? 'Preparing...' : 'Download'}
+                             </button>
+                        </div>
+                    </div>
+                )}
+       
               </div>
 
               {/* Title Copy */}
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', marginBottom: '0.5rem'}}>
-                 <div className={styles.sectionTitle} style={{margin: 0}}>Post Title</div>
+                 <div className={styles.sectionTitle} style={{margin: 0}}>XHS Video Title</div>
                  <button 
                     className={styles.actionBtn} 
                     onClick={() => handleCopy(selectedPost.title, 'title')} 
@@ -603,7 +683,7 @@ export default function VideoGalleryPage() {
 
               {/* Description Copy */}
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', marginBottom: '0.5rem'}}>
-                 <div className={styles.sectionTitle} style={{margin: 0}}>Description</div>
+                 <div className={styles.sectionTitle} style={{margin: 0}}>XHS Description</div>
                  <button 
                     className={styles.actionBtn} 
                     onClick={() => handleCopy(selectedPost.content, 'description')} 
@@ -626,7 +706,7 @@ export default function VideoGalleryPage() {
 
               {/* Hashtags Copy */}
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', marginBottom: '0.5rem'}}>
-                 <div className={styles.sectionTitle} style={{margin: 0}}>Hashtags</div>
+                 <div className={styles.sectionTitle} style={{margin: 0}}>XHS Hashtags</div>
                  <button 
                     className={styles.actionBtn} 
                     onClick={() => handleCopy(selectedPost.hashtags, 'hashtags')} 
@@ -646,6 +726,60 @@ export default function VideoGalleryPage() {
               <div className={styles.copyRow}>
                 <div className={styles.textContent}>{selectedPost.hashtags}</div>
               </div>
+
+              {/* TikTok Description Copy Section (New) */}
+              {selectedPost.tiktokDescription && (
+                  <>
+                      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', marginBottom: '0.5rem'}}>
+                         <div className={styles.sectionTitle} style={{margin: 0}}>TikTok Description</div>
+                         <button 
+                            className={styles.actionBtn} 
+                            onClick={() => handleCopy(selectedPost.tiktokDescription || '', 'tiktok_desc')} 
+                            style={{
+                                padding: '0.25rem 0.75rem', 
+                                fontSize: '0.8rem', 
+                                background: copiedState['tiktok_desc'] ? '#22c55e' : 'white',
+                                color: copiedState['tiktok_desc'] ? 'white' : 'inherit',
+                                borderColor: copiedState['tiktok_desc'] ? '#22c55e' : 'var(--border-color)',
+                                transition: 'all 0.2s'
+                            }}
+                         >
+                            {copiedState['tiktok_desc'] ? <Check size={14} /> : <Copy size={14} />} 
+                            {copiedState['tiktok_desc'] ? "Copied" : "Copy"}
+                         </button>
+                      </div>
+                      <div className={styles.copyRow}>
+                        <div className={styles.textContent}>{selectedPost.tiktokDescription}</div>
+                      </div>
+                  </>
+              )}
+
+              {/* TikTok Hashtags Copy Section (New) */}
+              {selectedPost.tiktokHashtags && (
+                  <>
+                      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', marginBottom: '0.5rem'}}>
+                         <div className={styles.sectionTitle} style={{margin: 0}}>TikTok Hashtags</div>
+                         <button 
+                            className={styles.actionBtn} 
+                            onClick={() => handleCopy(selectedPost.tiktokHashtags || '', 'tiktok_hashtags')} 
+                            style={{
+                                padding: '0.25rem 0.75rem', 
+                                fontSize: '0.8rem', 
+                                background: copiedState['tiktok_hashtags'] ? '#22c55e' : 'white',
+                                color: copiedState['tiktok_hashtags'] ? 'white' : 'inherit',
+                                borderColor: copiedState['tiktok_hashtags'] ? '#22c55e' : 'var(--border-color)',
+                                transition: 'all 0.2s'
+                            }}
+                         >
+                            {copiedState['tiktok_hashtags'] ? <Check size={14} /> : <Copy size={14} />} 
+                            {copiedState['tiktok_hashtags'] ? "Copied" : "Copy"}
+                         </button>
+                      </div>
+                      <div className={styles.copyRow}>
+                        <div className={styles.textContent}>{selectedPost.tiktokHashtags}</div>
+                      </div>
+                  </>
+              )}
 
             </div>
           </div>

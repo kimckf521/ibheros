@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.7.2",
+    "@google/generative-ai": "^0.24.1",
     "clsx": "^2.1.1",
     "firebase": "^12.7.0",
     "lucide-react": "^0.556.0",
