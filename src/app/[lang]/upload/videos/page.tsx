@@ -35,6 +35,7 @@ export default function VideoGalleryPage() {
   const [copiedState, setCopiedState] = useState<{[key: string]: boolean}>({});
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   // Helper to fetch posts (extracted to reuse after updates)
   const fetchPosts = async () => {
@@ -167,31 +168,10 @@ export default function VideoGalleryPage() {
   const params = useParams(); // Need to import this.
 
   const handleShare = async (post: Post) => {
-     if (!post.id) return;
-     
-     // Construct the DETAIL PAGE URL
-     // Assuming structure is domain/[lang]/videos/[id]
-     // We can get [lang] from params or URL.
-     const lang = params?.lang || 'en'; // Default fallback
+     const lang = params?.lang || 'zh'; // Default to zh based on project legacy
      const detailUrl = `${window.location.origin}/${lang}/videos/${post.id}`;
      
-     // 1. Try to copy to clipboard automatically
-     if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(detailUrl)
-          .then(() => {
-             // 2. Visual Feedback
-             setCopiedState(prev => ({ ...prev, ['share_link']: true }));
-             setTimeout(() => {
-               setCopiedState(prev => ({ ...prev, ['share_link']: false }));
-             }, 2000);
-          })
-          .catch(() => {
-             // Fallback if clipboard fails
-          });
-     }
-
-     // 3. ALWAYS Show the link
-     window.prompt("Share this video link:", detailUrl);
+     setShareUrl(detailUrl);
   };
 
   const formatDate = (timestamp: any) => {
@@ -781,6 +761,37 @@ export default function VideoGalleryPage() {
                   </>
               )}
 
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Share Link Popup */}
+      {shareUrl && (
+        <div className={styles.sharePopupOverlay} onClick={() => setShareUrl(null)}>
+          <div className={styles.sharePopupContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.sharePopupClose} onClick={() => setShareUrl(null)}>
+              <X size={20} />
+            </button>
+            <h3 className={styles.sharePopupTitle}>Share Post</h3>
+            
+            <div className={styles.sharePopupInputContainer}>
+              <div className={styles.sharePopupUrl}>{shareUrl}</div>
+              <button 
+                className={styles.sharePopupCopyBtn}
+                onClick={() => handleCopy(shareUrl, 'share_link')}
+                style={{
+                  background: copiedState['share_link'] ? '#22c55e' : '#3b82f6'
+                }}
+              >
+                {copiedState['share_link'] ? (
+                  <>
+                    <Check size={16} />
+                    <span>Copied</span>
+                  </>
+                ) : (
+                  <span>Copy</span>
+                )}
+              </button>
             </div>
           </div>
         </div>

@@ -276,13 +276,22 @@ export default function VideoUploadForm({ initialData, isEditMode = false }: Vid
             ...postData,
             createdAt: serverTimestamp(),
           });
+          
+          // Send WhatsApp Notification (Server Action)
+          try {
+             const { sendWhatsAppNotification } = await import("@/app/actions/send-whatsapp");
+             await sendWhatsAppNotification(title, videoUrlEn || videoUrlZh || "No Link");
+             console.log("WhatsApp Notification invoked");
+          } catch (err) {
+             console.error("WhatsApp Failed", err);
+          }
+
           // alert("Video published successfully!"); // Removed as requested
       }
 
       // Navigate to Videos Page - redirect immediately after save
       setIsSubmitting(false);
       router.push('/upload/videos');
-      return; // Ensure no further execution
 
     } catch (error: any) {
       console.error("Error saving post:", error);
