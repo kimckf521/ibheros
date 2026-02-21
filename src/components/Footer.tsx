@@ -40,7 +40,7 @@ const Footer = ({ dict, lang }: { dict: any, lang: string }) => {
         </div>
         
         <div className={styles.copyright}>
-          <p>© {new Date().getFullYear()} IB Heros Clone. {dict.footer.rights}</p>
+          <p>© 2026 IB Heros. {lang === 'en' ? 'All rights reserved.' : '版权所有。'}</p>
         </div>
       </div>
     </footer>
