@@ -45,7 +45,7 @@ The JSON structure must be exactly:
 **Language:** English
 **Structure:**
 1. Description: Short, punchy hook (1-2 sentences) followed by a quick summary. Use a trending/viral tone.
-2. Hashtags: 10-15 broad, high-volume English hashtags (e.g., #math, #fyp, #learnontiktok).
+2. Hashtags: EXACTLY 5 broad, high-volume English hashtags (Include: #math, #education, #learnontiktok, #fyp, #mathematics).
 **CRITICAL CONSTRAINTS:**
 - **NO LaTeX:** Never use \`$\` symbols. You MUST use Unicode characters for math (e.g., use x², √x, ÷, ±, π, θ). Ensure it displays correctly on mobile.
 - **NO Metas:** Do NOT mention "Manim", "Python", or software names. Focus only on the math concepts.
