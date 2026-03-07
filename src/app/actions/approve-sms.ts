@@ -22,14 +22,14 @@ export async function sendApproveSMSNotification(videoTitle: string) {
   try {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const to = process.env.SMS_CHECKING_RECIPIENT; 
+    const to = process.env.SMS_APPROVAL_RECIPIENT; 
     const from = process.env.TWILIO_SMS_FROM;
 
     if (!accountSid || !authToken || !to || !from) {
         const missing = [];
         if (!accountSid) missing.push('TWILIO_ACCOUNT_SID');
         if (!authToken) missing.push('TWILIO_AUTH_TOKEN');
-        if (!to) missing.push('SMS_CHECKING_RECIPIENT');
+        if (!to) missing.push('SMS_APPROVAL_RECIPIENT');
         if (!from) missing.push('TWILIO_SMS_FROM');
         
         const errorMsg = `Missing Twilio SMS Configuration: ${missing.join(', ')}`;
