@@ -53,10 +53,10 @@ export async function sendWhatsAppNotification(videoTitle: string, videoUrl: str
       from: fromNumber,
       to: toNumber,
       contentSid: contentSid,
-      // Note: Content Templates often use 'contentVariables' to pass dynamic data (title, url)
-      // Since the user didn't provide variables mapping, we just send the template.
-      // If the template expects variables ('{{1}}', etc), they might need to be added here.
-      // For now, mirroring the user's snippet which just had contentSid.
+      contentVariables: JSON.stringify({
+        "1": videoTitle,
+        "2": videoUrl
+      })
     });
 
     const successMsg = `WhatsApp message sent successfully: ${message.sid}`;

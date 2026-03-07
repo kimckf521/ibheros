@@ -5,7 +5,9 @@ import { useRouter, useParams } from 'next/navigation';
 import styles from '../../../../components/VideoGallery.module.css';
 import { db, auth } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, updateDoc, doc } from 'firebase/firestore';
-import { Download, Copy, X, Play, Image as ImageIcon, Edit, CheckCircle, Check, LayoutGrid, List, Share2, Code, Link, Loader2 } from 'lucide-react';
+import { Download, Copy, X, Play, Image as ImageIcon, Edit, CheckCircle, Check, LayoutGrid, List, Share2, Code, Link, Loader2, Bell, ChevronDown } from 'lucide-react';
+import { sendSMSNotification } from '@/app/actions/send-sms';
+import { sendApproveSMSNotification } from '@/app/actions/approve-sms';
 
 interface Post {
   id: string;
@@ -36,6 +38,9 @@ export default function VideoGalleryPage() {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [notifyDropdownOpen, setNotifyDropdownOpen] = useState(false);
+  const [notifying, setNotifying] = useState(false);
+  const [sentStatus, setSentStatus] = useState<{[postId: string]: { checking?: string, approve?: string }}>({});
 
   // Helper to fetch posts (extracted to reuse after updates)
   const fetchPosts = async () => {
@@ -172,6 +177,42 @@ export default function VideoGalleryPage() {
      const detailUrl = `${window.location.origin}/${lang}/videos/${post.id}`;
      
      setShareUrl(detailUrl);
+  };
+
+  const handleNotify = async (type: 'request' | 'approve') => {
+    if (!selectedPost) return;
+    
+    setNotifying(true);
+    const lang = params?.lang || 'zh';
+    const detailUrl = `${window.location.origin}/${lang}/videos/${selectedPost.id}`;
+    
+    try {
+      const result = type === 'request' 
+        ? await sendSMSNotification(selectedPost.title, detailUrl)
+        : await sendApproveSMSNotification(selectedPost.title);
+      
+      if (result.success) {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        const timestamp = `${timeStr}, ${dateStr}`;
+        
+        setSentStatus(prev => ({
+          ...prev,
+          [selectedPost.id]: {
+            ...prev[selectedPost.id],
+            [type === 'request' ? 'checking' : 'approve']: timestamp
+          }
+        }));
+      } else {
+        alert(`Failed to send notification: ${result.error}`);
+      }
+    } catch (error: any) {
+      alert(`An error occurred: ${error.message || error}`);
+    } finally {
+      setNotifying(false);
+      setNotifyDropdownOpen(false);
+    }
   };
 
   const formatDate = (timestamp: any) => {
@@ -402,15 +443,112 @@ export default function VideoGalleryPage() {
                     </div>
                   </div>
                   
-                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-                     {/* Edit Button */}
-                     <button 
-                       className={styles.actionBtn}
-                       onClick={handleEdit}
-                       style={{ height: '40px' }} // Match height
-                     >
-                       <Edit size={16} /> Edit
-                     </button>
+                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+                      {/* Notify Dropdown */}
+                      <div style={{ position: 'relative' }}>
+                        <button 
+                          className={styles.actionBtn}
+                          onClick={() => setNotifyDropdownOpen(!notifyDropdownOpen)}
+                          style={{ 
+                            height: '40px',
+                            background: notifyDropdownOpen ? '#f1f5f9' : 'white'
+                          }}
+                          disabled={notifying}
+                        >
+                          {notifying ? <Loader2 size={16} className={styles.spin} /> : <Bell size={16} />}
+                          Notify
+                          <ChevronDown size={14} style={{ marginLeft: '2px', opacity: 0.5 }} />
+                        </button>
+                        
+                        {notifyDropdownOpen && (
+                          <div style={{
+                             position: 'absolute',
+                             top: 'calc(100% + 5px)',
+                             right: 0,
+                             background: 'white',
+                             border: '1px solid #e2e8f0',
+                             borderRadius: '8px',
+                             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                             zIndex: 100,
+                             minWidth: '220px',
+                             overflow: 'hidden'
+                          }}>
+                            {/* Editing SMS Option */}
+                            <button 
+                              onClick={() => !sentStatus[selectedPost.id]?.checking && handleNotify('request')}
+                              disabled={!!sentStatus[selectedPost.id]?.checking || notifying}
+                              style={{
+                                width: '100%',
+                                padding: '0.85rem 1rem',
+                                textAlign: 'left',
+                                background: 'none',
+                                border: 'none',
+                                borderBottom: '1px solid #f1f5f9',
+                                cursor: sentStatus[selectedPost.id]?.checking ? 'default' : 'pointer',
+                                fontSize: '0.875rem',
+                                color: '#334155',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '2px',
+                                opacity: notifying && !sentStatus[selectedPost.id]?.checking ? 0.5 : 1
+                              }}
+                              onMouseEnter={(e) => !sentStatus[selectedPost.id]?.checking && (e.currentTarget.style.background = '#f8fafc')}
+                              onMouseLeave={(e) => !sentStatus[selectedPost.id]?.checking && (e.currentTarget.style.background = 'none')}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: sentStatus[selectedPost.id]?.checking ? '#94a3b8' : 'inherit' }}>
+                                <span style={{ fontWeight: 600 }}>Send Editing SMS</span>
+                                {sentStatus[selectedPost.id]?.checking && <Check size={14} color="#22c55e" />}
+                              </div>
+                              {sentStatus[selectedPost.id]?.checking && (
+                                <span style={{ fontSize: '0.75rem', color: '#22c55e', fontWeight: 500 }}>
+                                  Sent: {sentStatus[selectedPost.id].checking}
+                                </span>
+                              )}
+                            </button>
+
+                            {/* Checking SMS Option */}
+                            <button 
+                              onClick={() => !sentStatus[selectedPost.id]?.approve && handleNotify('approve')}
+                              disabled={!!sentStatus[selectedPost.id]?.approve || notifying}
+                              style={{
+                                width: '100%',
+                                padding: '0.85rem 1rem',
+                                textAlign: 'left',
+                                background: 'none',
+                                border: 'none',
+                                cursor: sentStatus[selectedPost.id]?.approve ? 'default' : 'pointer',
+                                fontSize: '0.875rem',
+                                color: '#334155',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '2px',
+                                opacity: notifying && !sentStatus[selectedPost.id]?.approve ? 0.5 : 1
+                              }}
+                              onMouseEnter={(e) => !sentStatus[selectedPost.id]?.approve && (e.currentTarget.style.background = '#f8fafc')}
+                              onMouseLeave={(e) => !sentStatus[selectedPost.id]?.approve && (e.currentTarget.style.background = 'none')}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: sentStatus[selectedPost.id]?.approve ? '#94a3b8' : 'inherit' }}>
+                                <span style={{ fontWeight: 600 }}>Send Checking SMS</span>
+                                {sentStatus[selectedPost.id]?.approve && <Check size={14} color="#22c55e" />}
+                              </div>
+                              {sentStatus[selectedPost.id]?.approve && (
+                                <span style={{ fontSize: '0.75rem', color: '#22c55e', fontWeight: 500 }}>
+                                  Sent: {sentStatus[selectedPost.id].approve}
+                                </span>
+                              )}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Edit Button */}
+                      <button 
+                        className={styles.actionBtn}
+                        onClick={handleEdit}
+                        style={{ height: '40px' }} // Match height
+                      >
+                        <Edit size={16} /> Edit
+                      </button>
 
                      {/* Used Toggle Button */}
                      <button 

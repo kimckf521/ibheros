@@ -14,15 +14,15 @@ function logToFile(message: string) {
     }
 }
 
-export async function sendSMSNotification(videoTitle: string, videoUrl: string) {
-  const msg = "Attempting to send SMS notification...";
+export async function sendApproveSMSNotification(videoTitle: string) {
+  const msg = "Attempting to send Approve SMS notification...";
   console.log(msg);
   logToFile(msg);
   
   try {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const to = process.env.WHATSAPP_RECIPIENT_NUMBER; // Reusing the same recipient var
+    const to = process.env.WHATSAPP_RECIPIENT_NUMBER; 
     const from = process.env.TWILIO_SMS_FROM;
 
     if (!accountSid || !authToken || !to || !from) {
@@ -49,22 +49,22 @@ export async function sendSMSNotification(videoTitle: string, videoUrl: string) 
     const year = String(now.getFullYear()).slice(-2);
     const dateStr = `${time}, ${day}-${month}-${year}`;
 
-    const infoMsg = `Sending SMS from ${from} to ${to}`;
+    const infoMsg = `Sending Approve SMS from ${from} to ${to}`;
     console.log(infoMsg);
     logToFile(infoMsg);
 
     const message = await client.messages.create({
-      body: `🙏*New Video Uploaded!*🙏\n\nTime & Date: ${dateStr}\n\nTitle: ${videoTitle}\n\n(Sent from IB Heros)`,
+      body: `👌*${videoTitle} Approved*👌\n\nTime & Date: ${dateStr}\n\n(Sent from IB Heros)`,
       from: from,
       to: to,
     });
 
-    const successMsg = `SMS sent successfully: ${message.sid}`;
+    const successMsg = `Approve SMS sent successfully: ${message.sid}`;
     console.log(successMsg);
     logToFile(successMsg);
     return { success: true, messageId: message.sid };
   } catch (error: any) {
-    const errorMsg = `CRITICAL Error sending SMS: ${error.message || error}`;
+    const errorMsg = `CRITICAL Error sending Approve SMS: ${error.message || error}`;
     console.error(errorMsg);
     logToFile(errorMsg);
     return { success: false, error: error.message || 'Unknown error' };
