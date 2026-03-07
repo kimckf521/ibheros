@@ -8,6 +8,7 @@ import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, updateDoc
 import { Download, Copy, X, Play, Image as ImageIcon, Edit, CheckCircle, Check, LayoutGrid, List, Share2, Code, Link, Loader2, Bell, ChevronDown } from 'lucide-react';
 import { sendSMSNotification } from '@/app/actions/send-sms';
 import { sendApproveSMSNotification } from '@/app/actions/approve-sms';
+import { sendCheckingSMSNotification } from '@/app/actions/checking-sms';
 
 interface Post {
   id: string;
@@ -40,7 +41,7 @@ export default function VideoGalleryPage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [notifyDropdownOpen, setNotifyDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(false);
-  const [sentStatus, setSentStatus] = useState<{[postId: string]: { checking?: string, approve?: string }}>({});
+  const [sentStatus, setSentStatus] = useState<{[postId: string]: { editing?: string, checking?: string, approval?: string }}>({});
 
   // Helper to fetch posts (extracted to reuse after updates)
   const fetchPosts = async () => {
@@ -179,7 +180,7 @@ export default function VideoGalleryPage() {
      setShareUrl(detailUrl);
   };
 
-  const handleNotify = async (type: 'request' | 'approve') => {
+  const handleNotify = async (type: 'editing' | 'checking' | 'approval') => {
     if (!selectedPost) return;
     
     setNotifying(true);
@@ -187,9 +188,14 @@ export default function VideoGalleryPage() {
     const detailUrl = `${window.location.origin}/${lang}/videos/${selectedPost.id}`;
     
     try {
-      const result = type === 'request' 
-        ? await sendSMSNotification(selectedPost.title, detailUrl)
-        : await sendApproveSMSNotification(selectedPost.title);
+      let result;
+      if (type === 'editing') {
+        result = await sendSMSNotification(selectedPost.title, detailUrl);
+      } else if (type === 'checking') {
+        result = await sendCheckingSMSNotification(selectedPost.title);
+      } else {
+        result = await sendApproveSMSNotification(selectedPost.title);
+      }
       
       if (result.success) {
         const now = new Date();
@@ -201,7 +207,7 @@ export default function VideoGalleryPage() {
           ...prev,
           [selectedPost.id]: {
             ...prev[selectedPost.id],
-            [type === 'request' ? 'checking' : 'approve']: timestamp
+            [type]: timestamp
           }
         }));
       } else {
@@ -475,7 +481,40 @@ export default function VideoGalleryPage() {
                           }}>
                             {/* Editing SMS Option */}
                             <button 
-                              onClick={() => !sentStatus[selectedPost.id]?.checking && handleNotify('request')}
+                              onClick={() => !sentStatus[selectedPost.id]?.editing && handleNotify('editing')}
+                              disabled={!!sentStatus[selectedPost.id]?.editing || notifying}
+                              style={{
+                                width: '100%',
+                                padding: '0.85rem 1rem',
+                                textAlign: 'left',
+                                background: 'none',
+                                border: 'none',
+                                borderBottom: '1px solid #f1f5f9',
+                                cursor: sentStatus[selectedPost.id]?.editing ? 'default' : 'pointer',
+                                fontSize: '0.875rem',
+                                color: '#334155',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '2px',
+                                opacity: notifying && !sentStatus[selectedPost.id]?.editing ? 0.5 : 1
+                              }}
+                              onMouseEnter={(e) => !sentStatus[selectedPost.id]?.editing && (e.currentTarget.style.background = '#f8fafc')}
+                              onMouseLeave={(e) => !sentStatus[selectedPost.id]?.editing && (e.currentTarget.style.background = 'none')}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: sentStatus[selectedPost.id]?.editing ? '#94a3b8' : 'inherit' }}>
+                                <span style={{ fontWeight: 600 }}>Send Editing SMS</span>
+                                {sentStatus[selectedPost.id]?.editing && <Check size={14} color="#22c55e" />}
+                              </div>
+                              {sentStatus[selectedPost.id]?.editing && (
+                                <span style={{ fontSize: '0.75rem', color: '#22c55e', fontWeight: 500 }}>
+                                  Sent: {sentStatus[selectedPost.id].editing}
+                                </span>
+                              )}
+                            </button>
+
+                            {/* Checking SMS Option */}
+                            <button 
+                              onClick={() => !sentStatus[selectedPost.id]?.checking && handleNotify('checking')}
                               disabled={!!sentStatus[selectedPost.id]?.checking || notifying}
                               style={{
                                 width: '100%',
@@ -496,7 +535,7 @@ export default function VideoGalleryPage() {
                               onMouseLeave={(e) => !sentStatus[selectedPost.id]?.checking && (e.currentTarget.style.background = 'none')}
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: sentStatus[selectedPost.id]?.checking ? '#94a3b8' : 'inherit' }}>
-                                <span style={{ fontWeight: 600 }}>Send Editing SMS</span>
+                                <span style={{ fontWeight: 600 }}>Send Checking SMS</span>
                                 {sentStatus[selectedPost.id]?.checking && <Check size={14} color="#22c55e" />}
                               </div>
                               {sentStatus[selectedPost.id]?.checking && (
@@ -506,34 +545,34 @@ export default function VideoGalleryPage() {
                               )}
                             </button>
 
-                            {/* Checking SMS Option */}
+                            {/* Approval SMS Option */}
                             <button 
-                              onClick={() => !sentStatus[selectedPost.id]?.approve && handleNotify('approve')}
-                              disabled={!!sentStatus[selectedPost.id]?.approve || notifying}
+                              onClick={() => !sentStatus[selectedPost.id]?.approval && handleNotify('approval')}
+                              disabled={!!sentStatus[selectedPost.id]?.approval || notifying}
                               style={{
                                 width: '100%',
                                 padding: '0.85rem 1rem',
                                 textAlign: 'left',
                                 background: 'none',
                                 border: 'none',
-                                cursor: sentStatus[selectedPost.id]?.approve ? 'default' : 'pointer',
+                                cursor: sentStatus[selectedPost.id]?.approval ? 'default' : 'pointer',
                                 fontSize: '0.875rem',
                                 color: '#334155',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '2px',
-                                opacity: notifying && !sentStatus[selectedPost.id]?.approve ? 0.5 : 1
+                                opacity: notifying && !sentStatus[selectedPost.id]?.approval ? 0.5 : 1
                               }}
-                              onMouseEnter={(e) => !sentStatus[selectedPost.id]?.approve && (e.currentTarget.style.background = '#f8fafc')}
-                              onMouseLeave={(e) => !sentStatus[selectedPost.id]?.approve && (e.currentTarget.style.background = 'none')}
+                              onMouseEnter={(e) => !sentStatus[selectedPost.id]?.approval && (e.currentTarget.style.background = '#f8fafc')}
+                              onMouseLeave={(e) => !sentStatus[selectedPost.id]?.approval && (e.currentTarget.style.background = 'none')}
                             >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: sentStatus[selectedPost.id]?.approve ? '#94a3b8' : 'inherit' }}>
-                                <span style={{ fontWeight: 600 }}>Send Checking SMS</span>
-                                {sentStatus[selectedPost.id]?.approve && <Check size={14} color="#22c55e" />}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: sentStatus[selectedPost.id]?.approval ? '#94a3b8' : 'inherit' }}>
+                                <span style={{ fontWeight: 600 }}>Send Approval SMS</span>
+                                {sentStatus[selectedPost.id]?.approval && <Check size={14} color="#22c55e" />}
                               </div>
-                              {sentStatus[selectedPost.id]?.approve && (
+                              {sentStatus[selectedPost.id]?.approval && (
                                 <span style={{ fontSize: '0.75rem', color: '#22c55e', fontWeight: 500 }}>
-                                  Sent: {sentStatus[selectedPost.id].approve}
+                                  Sent: {sentStatus[selectedPost.id].approval}
                                 </span>
                               )}
                             </button>
