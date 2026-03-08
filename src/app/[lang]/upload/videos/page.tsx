@@ -42,6 +42,14 @@ export default function VideoGalleryPage() {
   const [notifyDropdownOpen, setNotifyDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(false);
   const [sentStatus, setSentStatus] = useState<{[postId: string]: { editing?: string, checking?: string, approval?: string }}>({});
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Helper to fetch posts (extracted to reuse after updates)
   const fetchPosts = async () => {
@@ -470,13 +478,16 @@ export default function VideoGalleryPage() {
                           <div style={{
                              position: 'absolute',
                              top: 'calc(100% + 5px)',
-                             right: 0,
+                             right: isMobile ? 'auto' : 0,
+                             left: isMobile ? '50%' : 'auto',
+                             transform: isMobile ? 'translateX(-50%)' : 'none',
                              background: 'white',
                              border: '1px solid #e2e8f0',
                              borderRadius: '8px',
                              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
                              zIndex: 100,
                              minWidth: '220px',
+                             maxWidth: '90vw',
                              overflow: 'hidden'
                           }}>
                             {/* Editing SMS Option */}
