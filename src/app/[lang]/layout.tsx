@@ -14,6 +14,7 @@ export async function generateStaticParams() {
 }
 
 import { Providers } from '@/components/Providers';
+import Script from 'next/script';
 
 export default async function RootLayout({
   children,
@@ -28,6 +29,23 @@ export default async function RootLayout({
 
   return (
     <html lang={validLang}>
+      <head>
+        {/* Google tag (gtag.js) */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-Y0J270BX4Z"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-Y0J270BX4Z');
+          `}
+        </Script>
+      </head>
       <body>
         <Providers>
           <Header dict={dict} lang={validLang} />
