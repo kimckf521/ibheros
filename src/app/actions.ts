@@ -117,3 +117,54 @@ export async function submitTutorApplication(formData: FormData) {
     return { success: false, message: 'Failed to submit application. Please try again later.' };
   }
 }
+
+export async function submitEnquiry(formData: FormData) {
+  try {
+    const rawData = {
+      studentName: formData.get('studentName'),
+      yearLevel: formData.get('yearLevel'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      subject: formData.get('subject'),
+      message: formData.get('message'),
+    };
+
+    // Basic validation
+    if (!rawData.studentName || !rawData.email || !rawData.message) {
+      return { success: false, message: 'Missing required fields' };
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    // Send email
+    await transporter.sendMail({
+      from: `"IB Heros Enquiry" <${process.env.SMTP_USER}>`,
+      to: 'ibheros7@gmail.com',
+      subject: `New Enquiry: ${rawData.studentName} - ${rawData.subject || 'General'}`,
+      html: `
+        <h1>New Website Enquiry</h1>
+        <ul>
+          <li><strong>Student Name:</strong> ${rawData.studentName}</li>
+          <li><strong>Year Level:</strong> ${rawData.yearLevel || 'N/A'}</li>
+          <li><strong>Email:</strong> ${rawData.email}</li>
+          <li><strong>Phone:</strong> ${rawData.phone || 'N/A'}</li>
+          <li><strong>Subject:</strong> ${rawData.subject || 'General'}</li>
+        </ul>
+        <h3>Message:</h3>
+        <p>${rawData.message}</p>
+      `,
+    });
+
+    return { success: true, message: 'Your enquiry has been sent successfully!' };
+
+  } catch (error) {
+    console.error('Error submitting enquiry:', error);
+    return { success: false, message: 'Failed to send enquiry. Please try again later.' };
+  }
+}

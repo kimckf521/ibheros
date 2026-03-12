@@ -189,7 +189,9 @@
       "science": "科学",
       "other": "其他",
       "message": "留言 / 特殊要求",
-      "submit": "发送信息"
+      "submit": "发送信息",
+      "success": "您的咨询已成功发送！",
+      "error": "发送失败，请稍后重试。"
     }
   },
   "joinTeamPage": {

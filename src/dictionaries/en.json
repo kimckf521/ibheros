@@ -189,7 +189,9 @@
       "science": "Science",
       "other": "Other",
       "message": "Message / Specific Requirements",
-      "submit": "Send Message"
+      "submit": "Send Message",
+      "success": "Your enquiry has been sent successfully!",
+      "error": "Failed to send enquiry. Please try again."
     }
   },
   "joinTeamPage": {
